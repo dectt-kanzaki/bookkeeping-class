@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1565c0">
+<meta name="description" content="全商簿記3級の仕訳50題にランダム出題で挑戦できるCBT形式の学習アプリ">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>全商簿記3級 仕訳CBTトレーニング</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+  background:#f4f7fb;color:#263238;
+}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.header{
+  background:linear-gradient(135deg,#1565c0,#42a5f5);
+  color:#fff;padding:24px 16px;text-align:center;
+}
+.header h1{margin:0;font-size:clamp(24px,4vw,36px)}
+.header p{margin:8px 0 0;font-size:15px}
+.header-tools{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;margin-top:15px}
+.header-chip{font-size:12px;padding:5px 10px;border:1px solid #ffffff70;border-radius:999px;background:#ffffff18}
+.install-btn{border:1px solid #fff;background:#fff;color:#1565c0;border-radius:999px;padding:7px 13px;font-weight:bold;font-size:13px}
+.app-footer{text-align:center;color:#78909c;font-size:12px;padding:0 12px 22px}
+.resume-btn{display:none;margin:10px auto 0;border:2px solid #1976d2;background:#eaf4ff;color:#1565c0;border-radius:999px;padding:12px 26px;font-weight:bold;font-size:16px}
+.start-note{font-size:13px!important;color:#78909c!important;margin-top:15px!important}
+.container{max-width:1050px;margin:0 auto;padding:24px 16px 50px}
+.card{
+  background:#fff;border-radius:24px;padding:28px;
+  box-shadow:0 8px 26px rgba(0,0,0,.08)
+}
+.start-screen{max-width:620px;margin:10px auto;text-align:center;padding:20px 10px 28px}
+.start-screen h2{font-size:clamp(23px,3vw,30px);color:#1565c0;margin:0 0 10px}
+.start-screen p{line-height:1.8;color:#546e7a}
+.name-field{max-width:420px;margin:24px auto 18px;text-align:left}
+.name-field label{display:block;font-weight:bold;margin-bottom:8px}
+.name-field input{text-align:left;font-size:18px}
+.start-btn{border:0;border-radius:999px;background:#1976d2;color:#fff;padding:14px 42px;font-weight:bold;font-size:18px;box-shadow:0 4px 12px #1976d233}
+.start-btn:hover{background:#1565c0}
+.topbar{
+  display:flex;align-items:center;gap:15px;margin-bottom:18px
+}
+.back-btn,.reset-btn{
+  border:0;background:#fff;color:#1565c0;border-radius:999px;
+  padding:9px 18px;box-shadow:0 3px 10px rgba(0,0,0,.08);font-weight:bold
+}
+.title-area{flex:1}
+.title-area h2{margin:0;font-size:25px}
+.title-area p{margin:4px 0 0;color:#607d8b}
+.stats{text-align:right;font-weight:bold;color:#455a64;white-space:nowrap}
+.progress{height:10px;background:#e1e8ef;border-radius:99px;overflow:hidden;margin-top:6px}
+.progress>div{height:100%;background:#42a5f5;width:0;transition:.3s}
+.problem-no{color:#78909c;margin:8px 0}
+.question{
+  font-size:clamp(19px,3vw,25px);font-weight:bold;
+  line-height:1.8;margin:8px 0 25px
+}
+.journal{
+  display:grid;grid-template-columns:1fr 1fr;gap:18px
+}
+.side{
+  background:#f8fafc;border:2px solid #e0e7ee;
+  border-radius:18px;padding:18px
+}
+.side h3{text-align:center;margin:0 0 15px;font-size:21px}
+.entry{
+  display:grid;grid-template-columns:1fr 125px;gap:8px;margin-bottom:9px
+}
+select,input{
+  width:100%;padding:11px;border:2px solid #d5dfe7;
+  border-radius:10px;background:#fff;outline:none
+}
+select:focus,input:focus{border-color:#42a5f5}
+input{text-align:right}
+.action{text-align:center;margin-top:22px}
+.judge{
+  border:0;border-radius:999px;background:#1976d2;color:#fff;
+  padding:13px 42px;font-weight:bold;font-size:17px
+}
+.judge:hover{background:#1565c0}
+.judge:disabled{background:#b0bec5;cursor:not-allowed}
+.result{
+  display:none;margin-top:22px;border-radius:17px;padding:19px
+}
+.result.correct{display:block;background:#e8f5e9;border:2px solid #81c784}
+.result.wrong{display:block;background:#ffebee;border:2px solid #ef9a9a}
+.result h3{margin:0 0 10px;font-size:21px}
+.result p{line-height:1.8;margin:7px 0}
+.answer-table{
+  width:100%;border-collapse:collapse;margin:12px 0;background:#fff
+}
+.answer-table th,.answer-table td{
+  border:1px solid #d5dde4;padding:9px;text-align:center
+}
+.answer-table th{background:#edf4fa}
+.next{text-align:center;margin-top:18px;display:none}
+.next.show{display:block}
+.next button{
+  border:0;border-radius:999px;background:#43a047;color:#fff;
+  padding:12px 34px;font-weight:bold
+}
+.message{
+  text-align:center;margin:20px 0;color:#546e7a;
+  background:#fff;border-radius:15px;padding:13px
+}
+.category-box{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px
+}
+.tag{
+  background:#e3f2fd;color:#1565c0;border-radius:999px;
+  padding:5px 12px;font-size:13px;font-weight:bold
+}
+.finish{text-align:center;padding:15px}
+.finish .big{font-size:42px;margin:5px}
+.finish h2{margin:8px 0}
+.home{
+  border:0;border-radius:999px;background:#1976d2;color:#fff;
+  padding:12px 30px;font-weight:bold
+}
+
+.nav-buttons{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+  margin-top:18px
+}
+.nav-btn{
+  border:2px solid #d7e0e8;background:#fff;color:#455a64;
+  border-radius:12px;padding:10px 8px;font-weight:bold
+}
+.nav-btn:hover{border-color:#90caf9;background:#f5faff}
+.question-list{
+  margin-top:15px;padding:15px;background:#f7f9fb;
+  border-radius:15px;border:1px solid #e0e7ee
+}
+.question-list h4{margin:0 0 10px}
+.question-grid{
+  display:grid;grid-template-columns:repeat(10,1fr);gap:7px
+}
+.qnum{
+  border:1px solid #cfd8dc;background:#fff;border-radius:8px;
+  padding:7px 2px;font-weight:bold;color:#455a64
+}
+.qnum.current{outline:3px solid #90caf9}
+.qnum.correct{background:#c8e6c9;border-color:#66bb6a;color:#1b5e20}
+.qnum.wrong{background:#ffcdd2;border-color:#ef5350;color:#b71c1c}
+.qnum.unanswered{background:#fff}
+.score-board{
+  display:flex;justify-content:center;gap:18px;flex-wrap:wrap;
+  margin:12px 0 4px;font-weight:bold;color:#455a64
+}
+.score-pill{background:#eef5fb;border-radius:999px;padding:7px 13px}
+
+
+.summary-wrap{margin:18px auto 0;text-align:left;max-width:100%}
+.summary-head{text-align:center;margin-bottom:12px}
+.summary-head h2{font-size:25px;margin:4px 0}
+.summary-meta{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;font-weight:bold;margin:8px 0}
+.summary-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.summary-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:12px}
+.summary-table th,.summary-table td{border:1px solid #cbd5df;padding:5px 6px;vertical-align:top}
+.summary-table th{background:#edf4fa}
+.summary-table .num{width:34px;text-align:center}
+.summary-table .status{width:54px;text-align:center;font-weight:bold;white-space:nowrap}
+.summary-table .ok{color:#1b5e20;background:#e8f5e9}
+.summary-table .ng{color:#b71c1c;background:#ffebee}
+.summary-table .na{color:#555;background:#f5f5f5}
+.summary-actions{text-align:center;margin:18px 0}
+.pdf-btn{border:0;border-radius:999px;background:#2e7d32;color:white;padding:12px 28px;font-weight:bold;margin:5px}
+@page{size:A4 landscape;margin:8mm}
+@media print{
+  body{background:#fff!important;color:#111!important}
+  body *{visibility:hidden!important}
+  #finish,#finish *{visibility:visible!important}
+  #finish{display:block!important;position:absolute;left:0;top:0;width:100%;margin:0;padding:0!important;text-align:left!important}
+  .summary-wrap{margin:0;max-width:none}
+  .summary-head{margin-bottom:5px}
+  .summary-head h2{font-size:16pt;margin:0}
+  .summary-head .summary-subtitle{font-size:8pt;margin:2px 0}
+  .summary-meta{font-size:9pt;gap:16px;margin:4px 0 7px}
+  .summary-columns{grid-template-columns:1fr 1fr;gap:6mm}
+  .summary-table{font-size:7.5pt;line-height:1.1}
+  .summary-table th,.summary-table td{padding:2.2px 4px}
+  .summary-table .num{width:25px}
+  .summary-table .status{width:42px}
+  .summary-actions,.no-print{display:none!important}
+  .summary-table tr{break-inside:avoid}
+}
+@media(max-width:700px){
+  .card{padding:18px}
+  .topbar{align-items:flex-start}
+  .stats{font-size:13px}
+  .journal{grid-template-columns:1fr}
+  .entry{grid-template-columns:1fr 120px}
+  .nav-buttons{grid-template-columns:1fr 1fr}
+  .nav-btn:nth-child(2){grid-column:auto;grid-row:auto}
+  .question-grid{grid-template-columns:repeat(5,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>📘 全商簿記3級 仕訳CBTトレーニング</h1>
+  <p>その他の債権・債務を中心に学ぶ、全10問の仕訳CBTトレーニング</p>
+  <div class="header-tools"><span class="header-chip">全10問</span><span class="header-chip">100点満点</span><span class="header-chip">学習状況を自動保存</span><button id="installBtn" class="install-btn" style="display:none" onclick="installApp()">＋ アプリをインストール</button></div>
+</header>
+
+<main class="container">
+<div class="card">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="confirmBack()">← 終了</button>
+    <div class="title-area">
+      <h2>🧾 仕訳問題</h2>
+      <p>勘定科目と金額を正しく入力してください。</p>
+    </div>
+    <div class="stats">
+      <div id="counter">1 / 10</div>
+      <div class="progress"><div id="progressBar"></div></div>
+    </div>
+  </div>
+
+  <div class="score-board">
+    <span class="score-pill">得点：<span id="score">0</span> / 100点</span>
+    <span class="score-pill">正解：<span id="correctCount">0</span>問</span>
+    <span class="score-pill">未回答：<span id="unansweredCount">0</span>問</span>
+  </div>
+
+  <div id="startScreen" class="start-screen">
+    <h2>📘 仕訳CBTトレーニング</h2>
+    <p>問題を始める前に、結果一覧に表示する名前を入力してください。<br>入力した名前は、採点結果とPDF保存用の結果一覧に表示されます。</p>
+    <div class="name-field">
+      <label for="resultNameInput">結果表示用の名前</label>
+      <input id="resultNameInput" type="text" maxlength="40" placeholder="例：簿記 太郎" autocomplete="name" onkeydown="if(event.key==='Enter') startQuiz()">
+    </div>
+    <button class="start-btn" onclick="startQuiz()">新しく始める →</button>
+    <button id="resumeBtn" class="resume-btn" onclick="resumeQuiz()">前回の続きから再開 →</button>
+    <p class="start-note">回答や途中入力はこの端末のブラウザに自動保存されます。</p>
+  </div>
+
+  <div id="quiz" style="display:none">
+    <div class="category-box" id="categoryTags"></div>
+    <div class="problem-no" id="problemNo"></div>
+    <div class="question" id="question"></div>
+
+    <div class="journal">
+      <div class="side"><h3>借方</h3><div id="debitEntries"></div></div>
+      <div class="side"><h3>貸方</h3><div id="creditEntries"></div></div>
+    </div>
+
+    <div class="action">
+      <button class="judge" id="judgeBtn" onclick="judge()">✅ 判定する</button>
+    </div>
+
+    <div class="nav-buttons">
+      <button class="nav-btn" id="prevBtn" onclick="prevQuestion()">← 前の問題</button>
+      <button class="nav-btn" id="listBtn" onclick="showQuestionList()">☷ 問題一覧</button>
+      <button class="nav-btn" id="progressResultBtn" onclick="showProgressSummary()">📊 途中結果一覧</button>
+      <button class="nav-btn" id="nextBtn" onclick="nextQuestion()">次の問題 →</button>
+    </div>
+
+    <div id="questionList" class="question-list" style="display:none"></div>
+
+    <div id="result" class="result">
+      <h3 id="resultTitle"></h3>
+      <div id="resultBody"></div>
+    </div>
+
+    <div id="next" class="next">
+      <button onclick="nextQuestion()">次の問題へ →</button>
+    </div>
+
+    <div class="message">
+      💡 <strong>ポイント：</strong>
+      勘定科目だけでなく、借方・貸方の位置と金額まで正しく入力しましょう。
+    </div>
+  </div>
+
+  <div id="finish" style="display:none" class="finish"></div>
+
+</div>
+</main>
+<footer class="app-footer">全商簿記3級 仕訳CBTトレーニング ・ 学習データはこの端末内に保存されます</footer>
+
+<script>
+/* =========================================================
+   勘定科目
+   ========================================================= */
+const accounts = [
+  "選択してください",
+  "現金",
+  "当座預金",
+  "貸付金",
+  "借入金",
+  "支払利息",
+  "受取利息",
+  "備品",
+  "未払金",
+  "未収金",
+  "仕入",
+  "売上",
+  "前払金",
+  "前受金",
+  "売掛金",
+  "買掛金",
+  "仮払金",
+  "仮受金",
+  "旅費",
+  "給料",
+  "従業員預り金",
+  "所得税預り金"
+];
+
+const problems = [
+  {
+    category: "その他の債権債務・問題1",
+    q: "銀行から借用証書によって、現金￥300,000を借り入れた。",
+    debitLines: [{account:"現金", amount:300000}],
+    creditLines: [{account:"借入金", amount:300000}],
+    explanation: "現金を借り入れたため、現金が増加し、借入金が増加します。"
+  },
+  {
+    category: "その他の債権債務・問題2",
+    q: "佐世保商店に対する貸付金￥250,000が期日となり、利息￥3,000とともに同店振り出しの小切手で受け取り、ただちに当座預金とした。",
+    debitLines: [{account:"当座預金", amount:253000}],
+    creditLines: [{account:"貸付金", amount:250000},{account:"受取利息", amount:3000}],
+    explanation: "受け取った小切手をただちに当座預金とするため、貸付金の回収額と受取利息の合計を当座預金に計上します。"
+  },
+  {
+    category: "その他の債権債務・問題3",
+    q: "営業用の机・ロッカーを￥450,000で買い入れ、代金は月末に支払うことにした。",
+    debitLines: [{account:"備品", amount:450000}],
+    creditLines: [{account:"未払金", amount:450000}],
+    explanation: "営業用の机・ロッカーは備品として計上し、後日支払う代金は未払金で処理します。"
+  },
+  {
+    category: "その他の債権債務・問題4",
+    q: "以前購入していた営業用机・ロッカー￥450,000を未払金勘定に計上していたが、本日、その代金を現金で支払った。",
+    debitLines: [{account:"未払金", amount:450000}],
+    creditLines: [{account:"現金", amount:450000}],
+    explanation: "未払金を現金で支払ったため、未払金と現金がそれぞれ減少します。"
+  },
+  {
+    category: "その他の債権債務・問題5",
+    q: "大村商店から商品￥300,000を仕入れ、代金はさきに支払ってある内金￥60,000を差し引き、残額は掛けとした。",
+    debitLines: [{account:"仕入", amount:300000}],
+    creditLines: [{account:"前払金", amount:60000},{account:"買掛金", amount:240000}],
+    explanation: "仕入全額を仕入として計上し、支払済みの内金は前払金を減らし、残額は買掛金とします。"
+  },
+  {
+    category: "その他の債権債務・問題6",
+    q: "大村商店へ商品￥300,000を売り渡し、代金はさきに受け取っていた内金￥60,000を差し引き、残額は掛けとした。",
+    debitLines: [{account:"前受金", amount:60000},{account:"売掛金", amount:240000}],
+    creditLines: [{account:"売上", amount:300000}],
+    explanation: "売上全額を計上し、受取済みの内金は前受金を減らし、残額は売掛金とします。"
+  },
+  {
+    category: "その他の債権債務・問題7",
+    q: "従業員が関東方面に出張するので、旅費概算払いとして現金￥80,000を前渡した。",
+    debitLines: [{account:"仮払金", amount:80000}],
+    creditLines: [{account:"現金", amount:80000}],
+    explanation: "旅費の実際額がまだ確定していないため、前渡額は仮払金として処理します。"
+  },
+  {
+    category: "その他の債権債務・問題8",
+    q: "仮払金勘定で処理していた￥80,000について、本日、出張していた従業員が帰店し、旅費の実際額は￥74,000であったので、残額￥6,000は現金で返済を受け精算した。",
+    debitLines: [{account:"旅費", amount:74000},{account:"現金", amount:6000}],
+    creditLines: [{account:"仮払金", amount:80000}],
+    explanation: "実際の旅費￥74,000を旅費として計上し、返金された￥6,000を現金として処理し、仮払金￥80,000を消去します。"
+  },
+  {
+    category: "その他の債権債務・問題9",
+    q: "仮受金勘定で処理していた￥120,000について、本日、その金額は、長崎商店からの商品注文代金の内金であることがわかった。",
+    debitLines: [{account:"仮受金", amount:120000}],
+    creditLines: [{account:"前受金", amount:120000}],
+    explanation: "仮受金の内容が商品注文代金の内金と判明したため、前受金に振り替えます。"
+  },
+  {
+    category: "その他の債権債務・問題10",
+    q: "給料￥250,000の支払いにさいし、従業員の旅行積立金￥3,000と所得税￥12,500を差し引いて、残額は現金で支払った。",
+    debitLines: [{account:"給料", amount:250000}],
+    creditLines: [{account:"従業員預り金", amount:3000},{account:"所得税預り金", amount:12500},{account:"現金", amount:234500}],
+    explanation: "給料全額を費用として計上し、旅行積立金と所得税は預り金、差引支給額￥234,500は現金で処理します。"
+  }
+];
+
+let current=0;
+let correct=0;
+let answered=false;
+let retryMode=false;
+let retryQueue=[];
+let resultName="";
+const SESSION_KEY="zensho_boki3_other_claims_liabilities_v2";
+let deferredInstallPrompt=null;
+let restoredSession=null;
+
+/* 各問題の状態
+   unanswered = 未回答
+   correct = 正解
+   wrong = 不正解
+*/
+const answerStates = Array(problems.length).fill("unanswered");
+const userAnswers = Array(problems.length).fill(null);
+
+function makeEntryRows(side){
+  const host=document.getElementById(side+"Entries"); host.innerHTML="";
+  for(let i=0;i<3;i++){
+    const row=document.createElement("div"); row.className="entry";
+    const sel=document.createElement("select"); sel.id=side+"Account"+i;
+    accounts.forEach(a=>{const o=document.createElement("option");o.value=a;o.textContent=a;sel.appendChild(o)});
+    const amt=document.createElement("input"); amt.id=side+"Amount"+i; amt.type="number";amt.min="0";amt.placeholder="金額";
+    row.append(sel,amt);host.appendChild(row);
+  }
+}
+function init(){
+  // 起動時に前回の学習状況を復元できるようにする
+  document.getElementById("startScreen").style.display="block";
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("finish").style.display="none";
+  makeEntryRows("debit"); makeEntryRows("credit");
+  try{
+    const raw=localStorage.getItem(SESSION_KEY);
+    if(raw){
+      const data=JSON.parse(raw);
+      if(data && data.order && data.order.length===problems.length && data.started && !data.completed){
+        const byId=new Map(problems.map(p=>[p.category,p]));
+        const ordered=data.order.map(id=>byId.get(id)).filter(Boolean);
+        if(ordered.length===problems.length){
+          problems.splice(0,problems.length,...ordered);
+          if(Array.isArray(data.answerStates)&&data.answerStates.length===problems.length) answerStates.splice(0,answerStates.length,...data.answerStates);
+          if(Array.isArray(data.userAnswers)&&data.userAnswers.length===problems.length) userAnswers.splice(0,userAnswers.length,...data.userAnswers);
+          current=Math.min(Math.max(0,Number(data.current)||0),problems.length-1);
+          resultName=String(data.resultName||"");
+          retryMode=!!data.retryMode;
+          retryQueue=Array.isArray(data.retryQueue)?data.retryQueue:[];
+          document.getElementById("resultNameInput").value=resultName;
+          restoredSession=data;
+          const rb=document.getElementById("resumeBtn"); rb.style.display="inline-block";
+          rb.textContent=`前回の続きから再開（${answerStates.filter(x=>x!=="unanswered").length}/${problems.length}問 解答済み） →`;
+        }
+      }
+    }
+  }catch(e){ console.warn("学習データの復元に失敗しました",e); }
+  document.getElementById("resultNameInput").addEventListener("input",()=>{ if(!restoredSession) return; });
+  document.addEventListener("input",handleDraftChange);
+  document.addEventListener("change",handleDraftChange);
+  recalculateScore();
+  updateScore();
+}
+function handleDraftChange(event){
+  const el=event.target;
+  if(!el || !el.id || !/^(debit|credit)(Account|Amount)\d+$/.test(el.id)) return;
+  if(document.getElementById("quiz").style.display==="none" || answered) return;
+  userAnswers[current]={debit:getRawSide("debit"),credit:getRawSide("credit")};
+  persistSession();
+}
+function persistSession(completed=false){
+  try{
+    localStorage.setItem(SESSION_KEY,JSON.stringify({
+      order:problems.map(p=>p.category),answerStates,userAnswers,current,resultName,
+      retryMode,retryQueue,started:true,completed,updatedAt:Date.now()
+    }));
+  }catch(e){ /* 保存容量やプライベートモードの制限時も学習自体は継続可能 */ }
+}
+function shuffleQuestions(){
+  // Fisher–Yates法で問題の順番をランダムに並べ替える（問題文と正解データは一緒に移動）
+  for(let i=problems.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [problems[i],problems[j]]=[problems[j],problems[i]];
+  }
+}
+function startQuiz(){
+  const input=document.getElementById("resultNameInput");
+  resultName=input.value.trim();
+  if(!resultName){
+    alert("結果表示用の名前を入力してください。");
+    input.focus();
+    return;
+  }
+  // 新規開始時は前回の回答をリセットして全問をランダムに並べ替える
+  answerStates.fill("unanswered"); userAnswers.fill(null); current=0; correct=0; retryMode=false; retryQueue=[]; restoredSession=null;
+  shuffleQuestions();
+  document.getElementById("resumeBtn").style.display="none";
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("finish").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  current=0;
+  render();
+  updateScore();
+  persistSession();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function resumeQuiz(){
+  if(!restoredSession) return startQuiz();
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("finish").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  render();
+  persistSession();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function getRawSide(side){
+  // 判定前の途中入力も含め、3行すべての値をそのまま保存する
+  const arr=[];
+  for(let i=0;i<3;i++){
+    arr.push({
+      account:document.getElementById(side+"Account"+i).value,
+      amount:document.getElementById(side+"Amount"+i).value
+    });
+  }
+  return arr;
+}
+function getSide(side){
+  // 採点時には、勘定科目と金額が両方入力された行だけを仕訳として扱う
+  return getRawSide(side)
+    .filter(x=>x.account!=="選択してください" && x.amount!=="")
+    .map(x=>({account:x.account,amount:Number(x.amount)}));
+}
+function setSide(side,arr){
+  for(let i=0;i<3;i++){
+    const row=arr&&arr[i]?arr[i]:null;
+    document.getElementById(side+"Account"+i).value=row&&row.account?row.account:"選択してください";
+    document.getElementById(side+"Amount"+i).value=row&&row.amount!==undefined?row.amount:"";
+  }
+}
+function render(){
+  const p=problems[current];
+  if(!p){
+    document.getElementById("question").textContent="問題データを読み込めませんでした。ページを再読み込みしてください。";
+    return;
+  }
+  document.getElementById("quiz").style.display="block";
+  document.getElementById("finish").style.display="none";
+  answered=answerStates[current]!=="unanswered";
+  document.getElementById("problemNo").textContent=`問題 ${current+1}`;
+  document.getElementById("question").textContent=p.q;
+  const active=retryMode?retryQueue:problems.map((_,i)=>i);
+  const activePos=Math.max(0,active.indexOf(current));
+  document.getElementById("counter").textContent=retryMode?`やり直し ${activePos+1} / ${active.length}`:`${current+1} / ${problems.length}`;
+  document.getElementById("progressBar").style.width=`${((current+1)/problems.length)*100}%`;
+  document.getElementById("categoryTags").innerHTML=`<span class="tag">${p.category}</span>`;
+  const saved=userAnswers[current]; setSide("debit",saved?saved.debit:[]);setSide("credit",saved?saved.credit:[]);
+  const r=document.getElementById("result");r.className="result";
+  document.getElementById("resultTitle").textContent="";document.getElementById("resultBody").innerHTML="";
+  document.getElementById("next").classList.remove("show");document.getElementById("judgeBtn").disabled=answered;
+  if(answered)showResultForCurrent(); updateScore();updateNavigation();
+}
+function judge(){
+  if(answered)return;
+  const p=problems[current], debit=getSide("debit"), credit=getSide("credit");
+  userAnswers[current]={debit,credit};
+  const norm=a=>a.map(x=>`${x.account}|${x.amount}`).sort();
+  const ok=JSON.stringify(norm(debit))===JSON.stringify(norm(p.debitLines)) && JSON.stringify(norm(credit))===JSON.stringify(norm(p.creditLines));
+  answerStates[current]=ok?"correct":"wrong";answered=true;recalculateScore();showResultForCurrent();updateScore();updateNavigation();persistSession();
+}
+function showResultForCurrent(){
+  const p=problems[current],ok=answerStates[current]==="correct",r=document.getElementById("result");
+  r.className="result "+(ok?"correct":"wrong");
+  document.getElementById("resultTitle").textContent=ok?"⭕ 正解！":"❌ 不正解";
+  const rows=[]; const n=Math.max(p.debitLines.length,p.creditLines.length);
+  for(let i=0;i<n;i++){const d=p.debitLines[i],c=p.creditLines[i];rows.push(`<tr><td>${d?d.account:""}</td><td>${d?d.amount.toLocaleString()+"円":""}</td><td>${c?c.account:""}</td><td>${c?c.amount.toLocaleString()+"円":""}</td></tr>`)}
+  document.getElementById("resultBody").innerHTML=`<p><strong>正しい仕訳</strong></p><table class="answer-table"><tr><th>借方</th><th>金額</th><th>貸方</th><th>金額</th></tr>${rows.join("")}</table><p><strong>💡 解説</strong><br>${p.explanation}</p>`;
+  document.getElementById("judgeBtn").disabled=true;document.getElementById("next").classList.add("show");
+}
+function recalculateScore(){
+  correct=answerStates.filter(x=>x==="correct").length;
+}
+
+function updateScore(){
+  const answeredCount=answerStates.filter(x=>x!=="unanswered").length;
+  const unansweredCount=problems.length-answeredCount;
+  document.getElementById("score").textContent=correct*10;
+  document.getElementById("correctCount").textContent=correct;
+  document.getElementById("answeredCount").textContent=answeredCount;
+  document.getElementById("unansweredCount").textContent=unansweredCount;
+}
+
+function activeIndexes(){ return retryMode ? retryQueue : problems.map((_,i)=>i); }
+function updateNavigation(){
+  const active=activeIndexes(), pos=active.indexOf(current);
+  document.getElementById("prevBtn").disabled=(pos<=0);
+  document.getElementById("nextBtn").textContent=pos===active.length-1 ? (retryMode?"やり直し結果 →":"採点する →") : "次の問題 →";
+}
+
+function prevQuestion(){
+  const active=activeIndexes(), pos=active.indexOf(current);
+  if(pos>0){
+    saveCurrentInput();
+    current=active[pos-1];
+    render();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }
+}
+
+function saveCurrentInput(){
+  // 判定ボタンを押していなくても、科目だけ・金額だけの入力を含めて履歴を保存
+  if(answered)return;
+  userAnswers[current]={debit:getRawSide("debit"),credit:getRawSide("credit")};
+  persistSession();
+}
+
+function nextQuestion(){
+  saveCurrentInput();
+  const active=activeIndexes(), pos=active.indexOf(current);
+  if(pos<active.length-1){
+    current=active[pos+1];
+    render();
+    persistSession();
+    window.scrollTo({top:0,behavior:"smooth"});
+  }else{
+    finish();
+  }
+}
+
+function showQuestionList(){
+  const box=document.getElementById("questionList");
+  if(box.style.display==="block"){
+    box.style.display="none";
+    return;
+  }
+
+  let html="<h4>問題一覧　<span style='font-weight:normal;font-size:13px'>色で回答状況を確認できます</span></h4><div class='question-grid'>";
+  problems.forEach((p,i)=>{
+    const state=answerStates[i];
+    html+=`<button class="qnum ${state} ${i===current?"current":""}" onclick="jumpTo(${i})">${i+1}</button>`;
+  });
+  html+="</div>";
+  box.innerHTML=html;
+  box.style.display="block";
+}
+
+function jumpTo(index){
+  saveCurrentInput();
+  current=index;
+  document.getElementById("questionList").style.display="none";
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function finish(){
+  saveCurrentInput();
+  recalculateScore();
+  const active=activeIndexes();
+  const unansweredInActive=active.filter(i=>answerStates[i]==="unanswered");
+  if(unansweredInActive.length){
+    current=unansweredInActive[0];
+    render();
+    alert(`未回答の問題が${unansweredInActive.length}問あります。すべて解答すると採点できます。`);
+    window.scrollTo({top:0,behavior:"smooth"});
+    return;
+  }
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("finish").style.display="block";
+  persistSession(true);
+  showFinalSummary(retryMode ? "やり直し結果" : "採点結果");
+}
+
+function startRetry(){
+  retryQueue=answerStates.map((x,i)=>x==="wrong"?i:-1).filter(i=>i>=0);
+  if(!retryQueue.length){ showFinalSummary(); return; }
+  // 間違えた問題のやり直し順もランダムにする
+  for(let i=retryQueue.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [retryQueue[i],retryQueue[j]]=[retryQueue[j],retryQueue[i]];
+  }
+  retryMode=true;
+  retryQueue.forEach(i=>{answerStates[i]="unanswered";userAnswers[i]=null;});
+  current=retryQueue[0];
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("finish").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  render();
+  persistSession();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function showProgressSummary(){
+  saveCurrentInput();
+  recalculateScore();
+  showFinalSummary("途中経過");
+}
+
+function returnToQuiz(){
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("finish").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function showFinalSummary(title="採点結果"){
+  const isProgress = title === "途中経過";
+  const correctNow=answerStates.filter(x=>x==="correct").length;
+  const wrongNow=answerStates.map((x,i)=>x==="wrong"?i:-1).filter(i=>i>=0);
+  const answeredNow=answerStates.filter(x=>x!=="unanswered").length;
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("finish").style.display="block";
+  const makeRows=(from,to)=>problems.slice(from,to).map((p,offset)=>{
+    const i=from+offset, state=answerStates[i];
+    const status=state==="correct"?"正解":state==="wrong"?"不正解":"未回答";
+    const cls=state==="correct"?"ok":state==="wrong"?"ng":"na";
+    const question=p.q.length>43?p.q.slice(0,43)+"…":p.q;
+    return `<tr><td class="num">${i+1}</td><td>${escapeHtml(question)}</td><td class="status ${cls}">${status}</td></tr>`;
+  }).join("");
+  const mid=Math.ceil(problems.length/2);
+  const wrongList=wrongNow.length?`<p class="no-print"><strong>やり直し対象：</strong>${wrongNow.map(i=>`第${i+1}問`).join("、")}</p>`:'<p class="no-print">間違いはありません。全問正解です！</p>';
+  document.getElementById("finish").innerHTML=`
+    <div class="summary-wrap">
+      <div class="summary-head">
+        <h2>📊 ${title}・問題別結果一覧</h2>
+        <p class="summary-subtitle">全商簿記3級 仕訳CBT練習（全${problems.length}題）</p>
+        <p class="summary-subtitle" style="font-size:16px;font-weight:bold;margin-top:7px">名前：${escapeHtml(resultName || "（未入力）")}</p>
+        <div class="summary-meta">
+          <span>得点：${correctNow*10} / 100点</span>
+          <span>正解：${correctNow}問</span>
+          <span>不正解：${wrongNow.length}問</span>
+          <span>解答済み：${answeredNow} / ${problems.length}問</span>
+        </div>
+      </div>
+      <div class="summary-columns">
+        <table class="summary-table"><thead><tr><th class="num">問</th><th>問題（内容）</th><th class="status">正誤</th></tr></thead><tbody>${makeRows(0,mid)}</tbody></table>
+        <table class="summary-table"><thead><tr><th class="num">問</th><th>問題（内容）</th><th class="status">正誤</th></tr></thead><tbody>${makeRows(mid,problems.length)}</tbody></table>
+      </div>
+      ${wrongList}
+      <div class="summary-actions">
+        <button class="pdf-btn" onclick="downloadResultPDF()">📄 結果一覧をPDFで保存</button>
+        ${isProgress?'<button class="home" onclick="returnToQuiz()">↩ 問題に戻って続ける</button>':''}
+        ${wrongNow.length?'<button class="home" onclick="startRetry()">❌ 間違えた問題をやり直す</button>':''}
+        ${!isProgress?'<button class="home" onclick="location.reload()">最初からやり直す</button>':''}
+      </div>
+      <p class="no-print" style="font-size:12px;color:#607d8b;text-align:center">PDFボタンを押し、印刷画面で「PDFに保存」を選んでください。</p>
+    </div>`;
+}
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function downloadResultPDF(){ window.print(); }
+
+function reviewQuestion(index){
+  current=index;
+  document.getElementById("startScreen").style.display="none";
+  document.getElementById("finish").style.display="none";
+  document.getElementById("quiz").style.display="block";
+  render();
+}
+
+function confirmBack(){
+  if(confirm("学習を終了してスタート画面に戻りますか？ 入力内容は保存され、次回再開できます。")){
+    persistSession();
+    restoredSession=JSON.parse(localStorage.getItem(SESSION_KEY)||"null");
+    location.reload();
+  }
+}
+
+// インストール可能な環境では「アプリをインストール」を表示
+window.addEventListener("beforeinstallprompt",event=>{
+  event.preventDefault(); deferredInstallPrompt=event;
+  document.getElementById("installBtn").style.display="inline-block";
+});
+window.addEventListener("appinstalled",()=>{
+  document.getElementById("installBtn").style.display="none";
+  deferredInstallPrompt=null;
+});
+async function installApp(){
+  if(!deferredInstallPrompt){
+    alert("インストールするには、このアプリをHTTPS対応のWebサイトまたはlocalhostで開いてください。ブラウザのメニューに「アプリをインストール」が表示される場合は、そこからも追加できます。");
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt=null;
+  document.getElementById("installBtn").style.display="none";
+}
+if("serviceWorker" in navigator && (location.protocol==="https:" || location.hostname==="localhost")){
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+
+// スクリプト実行タイミングにかかわらず初期化する
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", init, {once:true});
+}else{
+  init();
+}
+</script>
+</body>
+</html>
